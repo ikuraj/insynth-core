@@ -1,0 +1,5 @@
+/dist
+/testbuild
+/testresults
+/.cache
+/bin
