@@ -121,7 +121,7 @@ object TreePrinter {
         simpleNode =>
           if (!set.contains(simpleNode)){          
             printlnDeclsWithIndention(out, simpleNode.getDecls, length)
-            for (val (tpe, container) <- simpleNode.getParams) {
+            for ((tpe, container) <- simpleNode.getParams) {
               val tpeName = "["+tpe.toString+ "]"
               printlnWithIndention(out, tpeName, length)
               printlnWithIndention(out, "|", length + 4)
@@ -141,7 +141,7 @@ object TreePrinter {
         simpleNode =>
           if (!set.contains(simpleNode)){          
             printlnDeclNamesWithIndention(out, simpleNode.getDecls, length)
-            for (val (tpe, container) <- simpleNode.getParams) {
+            for ((tpe, container) <- simpleNode.getParams) {
               val tpeName = "["+tpe.toString+ "]"
               printlnWithIndention(out, tpeName, length)
               printlnWithIndention(out, "|", length + 4)
