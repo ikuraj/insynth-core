@@ -11,8 +11,8 @@ trait TDeclarationFactory extends TData {
   
   object DeclarationFactory {
     def getDecl(sdecl:SimpleDecl):Option[Declaration] = {
-      val declOption = if (sdecl.needReceiver) makeDecl(sdecl.getSymbol.fullName, sdecl.getReceiver.tpe, sdecl.getSymbol.tpe)
-                 else makeDecl(sdecl.getSymbol.fullName, sdecl.getSymbol.tpe)
+      val declOption = if (sdecl.needReceiver) makeDecl(sdecl.getSymbol.fullName, sdecl.getReceiver.tpe, ask(()=>sdecl.getSymbol.tpe) )
+                 else makeDecl(sdecl.getSymbol.fullName, ask(()=>sdecl.getSymbol.tpe) )
       
       declOption match {
         case Some(decl) =>

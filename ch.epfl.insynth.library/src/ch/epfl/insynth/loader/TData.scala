@@ -380,7 +380,7 @@ class RawData {
           imp <- imports
 	      tpe <- imp.expr.tpe.decls
 	      if (!tpe.nameString.contains("$")
-	          && tpe.exists
+	          && ask[Boolean](() => tpe.exists)
 	          && selected(tpe, imp.selectors)
 	          && !loadedTypes.exists(x => tpe.fullName.equals(x.fullName))
 	          && (tpe.isClass || tpe.isModule || tpe.isAbstractClass || tpe.isTrait)
