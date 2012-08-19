@@ -29,7 +29,7 @@ trait TLoader extends TCollector with TExtractor with TDeclarationFactory {
       if (data.hasDesiredType) {
 
         if (data.hasThisType) {
-          println("This type: "+ data.getThisType)
+          //println("This type: "+ data.getThisType)
           
           val thisOption = DeclarationFactory.getThisDecl(data.getThisType)
           
@@ -42,11 +42,11 @@ trait TLoader extends TCollector with TExtractor with TDeclarationFactory {
           }
         }
         
-        println("Locals: ")
+        //println("Locals: ")
         var locals = List.empty[Declaration]
         data.getLocals.foreach {
           localSym =>
-            println(localSym.fullName)
+            //println(localSym.fullName)
             
             val localOption = DeclarationFactory.getLocalDecl(localSym)
           
@@ -61,11 +61,11 @@ trait TLoader extends TCollector with TExtractor with TDeclarationFactory {
         //TODO:Check if locals are ordered
         WeightsLoader.loadLocalWeights(locals)
         
-        println("Type decls:")
+        //println("Type decls:")
         var mntDecls = List.empty[Declaration]
         data.getMostNestedOwnerTypeDecls.foreach {
           sdecl =>
-            println(sdecl.getSymbol.fullName)
+            //println(sdecl.getSymbol.fullName)
  
             val declOption = DeclarationFactory.getDecl(sdecl)
             
@@ -89,7 +89,7 @@ trait TLoader extends TCollector with TExtractor with TDeclarationFactory {
         
         WeightsLoader.loadSupertypeDeclsWeights(loadDecls(data.getSuperTypes, builder))
         
-        println("Desired type: "+data.getDesiredType)
+        //println("Desired type: "+data.getDesiredType)
                 
         val desiredTypeOption = ScalaTypeExtractor.getLocalType(data.getDesiredType)
 
@@ -107,7 +107,8 @@ trait TLoader extends TCollector with TExtractor with TDeclarationFactory {
        var decls = List.empty[Declaration]
        for {
          tpe <- types
-         decl <- tpe.tpe.decls
+         val tpeDecls = ask( () => tpe.tpe.decls )
+         decl <- tpeDecls
          if(!decl.nameString.contains("$") && 
 	        decl.exists &&
 	        decl.isPublic &&

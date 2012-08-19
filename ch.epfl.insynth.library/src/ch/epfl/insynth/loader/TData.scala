@@ -314,7 +314,7 @@ class RawData {
     private def mostNestedOwnerTypeDecls(rdata:RawData, locals:List[Symbol]):List[SimpleDecl] = {
       val tpe = rdata.getMostNestedOwnerType
       
-      val decls = tpe.tpe.decls.toList
+      val decls = ask( () => tpe.tpe.decls.toList)
         
       for {
 	    decl <- decls	      
