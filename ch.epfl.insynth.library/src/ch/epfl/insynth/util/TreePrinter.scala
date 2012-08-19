@@ -1,8 +1,11 @@
 package ch.epfl.insynth.util
+
 import ch.epfl.insynth.env._
 import ch.epfl.scala.trees._
+
 import java.io.PrintWriter
 import java.io.FileWriter
+import java.io.ByteArrayOutputStream
 
 object TreePrinter {
  
@@ -55,6 +58,18 @@ object TreePrinter {
     out.flush
     out.close
   }  
+    
+  def apply(answer:ContainerNode, depth:Int): String = {
+    val byteArrayOutputStream = new ByteArrayOutputStream()
+    val out = new PrintWriter(byteArrayOutputStream)
+        
+    out.println    
+    printAnswerWithDepth(out, answer, depth)
+    out.flush
+    out.close
+    
+    byteArrayOutputStream.toString
+  }
   
   def apply(fileName:String, msg:String, answer:ContainerNode, decls:List[Declaration]){
     val out = new PrintWriter(new FileWriter(fileName))

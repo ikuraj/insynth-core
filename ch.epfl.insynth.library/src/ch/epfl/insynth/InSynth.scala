@@ -30,7 +30,17 @@ class InSynth(val compiler: Global) extends TLoader with TPreLoder {
 
     val engine = new Engine(builder, desiredType, new WeightScheduler(), TimeOut(Config.getTimeOutSlot))
     
-    engine.run()
+    val time = System.currentTimeMillis
+      
+    val solution = engine.run()
+
+    if (solution != null) {
+      Config.inSynthLogger.info("Solution found in " + (System.currentTimeMillis - time) + " ms.")
+      Config.inSynthLogger.info("Solution found: " + TreePrinter(solution, 1))
+    } else 
+      Config.inSynthLogger.info("No solution found in " + (System.currentTimeMillis - time) + " ms")
+    
+    solution
   }
 
   private def wrapTypedTree(source: SourceFile, forceReload: Boolean): Tree =
