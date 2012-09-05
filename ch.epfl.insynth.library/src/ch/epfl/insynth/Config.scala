@@ -17,5 +17,11 @@ object Config {
   def removeLoggerHandler(handler: Handler) {
     inSynthLogger.removeHandler(handler)
   }
+  
+  // variable declaring number of levels of proof trees to log
+  private var _proofTreeLevelToLog = 3
+  // getter and setter
+  def proofTreeLevelToLog_=(lvl: Int) = _proofTreeLevelToLog = lvl  
+  def proofTreeLevelToLog = _proofTreeLevelToLog
 
 }

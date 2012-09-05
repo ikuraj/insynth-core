@@ -36,7 +36,7 @@ class InSynth(val compiler: Global) extends TLoader with TPreLoder {
 
     if (solution != null) {
       Config.inSynthLogger.info("Solution found in " + (System.currentTimeMillis - time) + " ms.")
-      Config.inSynthLogger.info("Solution found: " + TreePrinter(solution, 1))
+      Config.inSynthLogger.info("Solution found: " + TreePrinter(solution, Config.proofTreeLevelToLog))
     } else 
       Config.inSynthLogger.info("No solution found in " + (System.currentTimeMillis - time) + " ms")
     
