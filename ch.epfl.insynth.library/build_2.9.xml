@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="Ant ch.epfl.insynth.library for Scala 2.9" default="reinstall" basedir=".">
+	<description>
+    Ant project for building InSynth library
+  </description>
+
+	<!-- Read properties files -->
+	<property file="properties/version.properties"/>
+	<property file="properties/shared.properties"/>
+	<property file="properties/scala-2.9.build.properties"/>
+	
+	<!-- System paths -->
+	<path id="junit4.path">
+		<pathelement location="/home/ivcha/DevelopmentApps/eclipse_plugin/plugins/org.junit_4.8.2.v4_8_2_v20110321-1705/junit.jar"/>
+		<pathelement location="/home/ivcha/DevelopmentApps/eclipse_plugin/plugins/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+	</path>
+
+	<!-- The settings can be overridden in local.properties. -->
+	<property environment="env" />
+	<property name="java.home" value="${JAVA_HOME}" />
+	<property name="scala-library.jar" value="${scala.home}/lib/scala-library.jar" />
+	<property name="scala-compiler.jar" value="${scala.home}/lib/scala-compiler.jar" />
+	<property name="javac.default.params" value="" />
+	<property name="scalac.default.params" value="-deprecation -unchecked" />
+
+	<!-- Project paths -->
+	<property name="base.dir" value="${basedir}" />
+	<property name="sources.dir" value="${base.dir}/src" />
+	<property name="dist.dir" value="${base.dir}/dist" />
+	<property name="lib.dir" value="${basedir}/lib" />
+	<property name="build.dir" value="${base.dir}/bin" />
+	<property name="tests.dir" value="${base.dir}/test" />
+	<property name="tests.build.dir" value="${base.dir}/testbuild" />
+	<property name="tests.results.dir" value="${base.dir}/testresults" />
+	<property name="resources.dir" value="${base.dir}/src/resources" />
+
+	<!-- other properties -->
+	<property name="dist.jar" value="${dist.dir}/${lib.name}" />
+
+	<!-- required to use the tasks scalac, fsc and scaladoc -->
+	<taskdef resource="scala/tools/ant/antlib.xml">
+		<classpath>
+			<pathelement location="${scala-compiler.jar}" />
+			<pathelement location="${scala-library.jar}" />
+		</classpath>
+	</taskdef>
+
+	<target name="compile" description="compiles the project">
+		<echo>Compiling sources with scalac at ${scala.home}</echo>
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<scalac srcdir="${sources.dir}" destdir="${build.dir}" force="changed" addparams="${scalac.default.params}" >
+			<include name="**/*.scala" />
+			<include name="**/*.java" />
+			<classpath>
+				<pathelement location="${scala-compiler.jar}" />
+				<pathelement location="${scala-library.jar}" />
+				<pathelement location="${build.dir}" />
+			</classpath>
+		</scalac>
+	</target>
+
+	<target name="compile-tests" description="compiles tests for the project">
+		<mkdir dir="${tests.build.dir}" />
+		<scalac srcdir="${tests.dir}" destdir="${tests.build.dir}" force="changed" addparams="${scalac.default.params}" >
+			<include name="**/*.scala" />
+			<classpath>
+				<path refid="junit4.path"/>
+				<pathelement location="${scala-library.jar}" />
+				<pathelement location="${build.dir}" />
+			</classpath>
+		</scalac>
+	</target>
+
+	<target name="test" depends="compile, compile-tests" description="runs the tests">
+		<mkdir dir="${tests.results.dir}" />
+		<junit showoutput="yes" printsummary="yes" haltonfailure="no">
+			<classpath>
+				<path refid="junit4.path" />
+				<pathelement location="${build.dir}" />
+				<pathelement location="${tests.build.dir}"/>
+				<pathelement location="${scala-library.jar}" />				
+			</classpath>
+
+			<formatter type="xml" />
+			<batchtest fork="yes" todir="${tests.results.dir}/">
+				<fileset dir="${tests.build.dir}" />
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="dist" depends="compile, test" description="build the jar file">
+		<manifest file="${dist.dir}/MANIFEST.MF">
+			<attribute name="Built-By" value="Ivan Kuraj, Tihomir Gvero" />
+			<attribute name="Created-By" value="Scala, Java, Ant" />
+			<attribute name="Class-Path" value="" />
+		</manifest>
+
+		<jar destfile="${dist.jar}" manifest="${dist.dir}/MANIFEST.MF">
+			<fileset dir="${build.dir}" />
+			<fileset dir="${sources.dir}">
+				<include name="resources/*" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="clean" description="cleans up">
+		<delete dir="${build.dir}" includeemptydirs="yes" quiet="yes" failonerror="no" />
+		<delete dir="${dist.dir}" includeemptydirs="yes" quiet="yes" failonerror="no" />
+		<delete dir="${tests.build.dir}" includeemptydirs="yes" quiet="yes" failonerror="no" />
+		<delete dir="${tests.results.dir}" includeemptydirs="yes" quiet="yes" failonerror="no" />
+		<delete>
+			<fileset dir="${basedir}" includes="**/*.class" />
+		</delete>
+	</target>
+	
+  <target name="install" depends="dist">
+  	<echo>Installing InSynth library version ${version} for Scala ${scala.version}</echo>
+  	<copy file="${dist.jar}" tofile="${install.dir}/${lib.name}" overwrite="true" />
+  	<echo>Artifact ${lib.name} has been copied to ${install.dir}</echo>
+  </target>
+
+  <target name="delete-from-maven-repository">
+  	<delete dir="${library.maven.dir}" />
+  </target>
+	
+  <target name="uninstall" depends="clean, delete-from-maven-repository">
+  	<delete file="${install.dir}/${lib.name}"/>
+  </target>
+
+  <target name="reinstall">
+  	<antcall target="uninstall"/>
+  	<antcall target="install"/>
+  </target>
+
+</project>

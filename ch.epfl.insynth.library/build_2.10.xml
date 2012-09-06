@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<project name="ch.epfl.insynth.library" default="install" basedir=".">
+<project name="Ant ch.epfl.insynth.library for Scala 2.10" default="reinstall" basedir=".">
 	<description>
     Ant project for building InSynth library
   </description>
 
-	<property name="version" value=""/>
-	<property name="lib.name" value="ch.epfl.insynth.library.jar" />
-	<property name="install.dir" value="/home/ivcha/git/scala-ide-insynth-integration/ch.epfl.insynth.build/ch.epfl.insynth.library" />
-	<property name="library.maven.dir" value="/home/ivcha/.m2/repository/ch/epfl/ch.epfl.insynth.library/" />
+	<!-- Read properties files -->
+	<property file="properties/version.properties"/>
+	<property file="properties/shared.properties"/>
+	<property file="properties/scala-2.10.build.properties"/>
 	
 	<!-- System paths -->
 	<path id="junit4.path">
@@ -18,10 +18,10 @@
 
 	<!-- The settings can be overridden in local.properties. -->
 	<property environment="env" />
-	<property name="scala.home" value="${SCALA_HOME}" />
 	<property name="java.home" value="${JAVA_HOME}" />
 	<property name="scala-library.jar" value="${scala.home}/lib/scala-library.jar" />
 	<property name="scala-compiler.jar" value="${scala.home}/lib/scala-compiler.jar" />
+	<property name="scala-reflect.jar" value="${scala.home}/lib/scala-reflect.jar"/>
 	<property name="javac.default.params" value="" />
 	<property name="scalac.default.params" value="-deprecation -unchecked" />
 
@@ -44,6 +44,7 @@
 		<classpath>
 			<pathelement location="${scala-compiler.jar}" />
 			<pathelement location="${scala-library.jar}" />
+			<pathelement location="${scala-reflect.jar}" />
 		</classpath>
 	</taskdef>
 
@@ -57,6 +58,7 @@
 			<classpath>
 				<pathelement location="${scala-compiler.jar}" />
 				<pathelement location="${scala-library.jar}" />
+				<pathelement location="${scala-reflect.jar}" />
 				<pathelement location="${build.dir}" />
 			</classpath>
 		</scalac>
@@ -116,8 +118,10 @@
 		</delete>
 	</target>
 	
-  <target name="install" depends="dist">    
+  <target name="install" depends="dist">
+  	<echo>Installing InSynth library version ${version} for Scala ${scala.version}</echo>
   	<copy file="${dist.jar}" tofile="${install.dir}/${lib.name}" overwrite="true" />
+  	<echo>Artifact ${lib.name} has been copied to ${install.dir}</echo>
   </target>
 
   <target name="delete-from-maven-repository">
@@ -126,6 +130,11 @@
 	
   <target name="uninstall" depends="clean, delete-from-maven-repository">
   	<delete file="${install.dir}/${lib.name}"/>
+  </target>
+
+  <target name="reinstall">
+  	<antcall target="uninstall"/>
+  	<antcall target="install"/>
   </target>
 
 </project>
