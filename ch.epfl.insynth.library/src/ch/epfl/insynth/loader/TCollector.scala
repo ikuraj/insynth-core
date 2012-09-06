@@ -282,7 +282,12 @@ class Collector {
 
     private def isCompletition(tree:Tree) = tree match {
       case t @ Apply(_,_) => {
-        t.toString.equals("scala.this{type}.Predef.exit{()Nothing}(){Nothing}")
+        t.toString match {
+          case "scala.this{type}.Predef.exit{()Nothing}(){Nothing}" => true
+          // added for Scala 2.10 compatibility
+          case "scala.this{scala.type}.Predef.exit{()Nothing}(){Nothing}" => true
+          case _ => false
+        }
       }
       case t => {
         false
