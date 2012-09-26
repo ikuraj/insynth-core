@@ -16,11 +16,17 @@ trait Formatable {
   
   override def toString = {
     val stringWriter = new java.io.StringWriter
-	this.toDocument.format(140, stringWriter)
+		this.toDocument.format(140, stringWriter)
     stringWriter.flush()    
     stringWriter.toString
   }
   
+}
+
+object Formatable {
+  def apply(d: Document) = new Formatable {
+    override def toDocument = d
+  }
 }
 
 object FormatHelpers {	
@@ -32,10 +38,10 @@ object FormatHelpers {
     group("{" :/: d :/: "}")
 	
   def nestedParen(d: Document): Document =
-    group("(" :: nest(1, break :: d) :/: ")")
+    group("(" :: nest(1, break :: d) :: ")")
 	
   def nestedBrackets(d: Document): Document =
-    group("{" :: nest(1, break :: d) :/: "}")
+    group("{" :: nest(1, break :: d) :: "}")
 
   def sqBrackets(d: Document) =
     group("[" :: d :: "]")
@@ -52,11 +58,16 @@ object FormatHelpers {
 //  def taggedParen2(tag: String, d1: Document, d2: Document) =
 //    taggedParen(tag, d1 :: nest(-tag.length, break :: d2))
 
-  def foldDoc(docs: List[Document], sep: Document): Document = docs match {
-    case Nil => empty
-    case d :: Nil => d
-    case d :: ds => d :: sep :/: foldDoc(ds, sep)
-    case d => throw new RuntimeException("asd" + d)
+  def foldDoc(docs: List[Document], sep: Document): Document = {
+    def foldDocRec(docs: List[Document], sep: Document): Document =
+	    docs match {
+		    case Nil => empty
+		    case d :: Nil => d
+		    case d :: ds => d :: sep :: foldDoc(ds, sep)
+		    case d => throw new RuntimeException("Wrong arugment to foldDoc: " + d)
+		  }
+    
+    foldDocRec(docs filterNot { _ == DocNil }, sep)
   }
 
   def seqToDoc[T](docs: List[T], sep: String, toDoc: T=>Document): Document =
