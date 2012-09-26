@@ -78,7 +78,7 @@
 
 	<target name="test" depends="compile, compile-tests" description="runs the tests">
 		<mkdir dir="${tests.results.dir}" />
-		<junit showoutput="yes" printsummary="yes" haltonfailure="no">
+		<junit showoutput="yes" printsummary="yes" haltonfailure="yes">
 			<classpath>
 				<path refid="junit4.path" />
 				<pathelement location="${build.dir}" />
