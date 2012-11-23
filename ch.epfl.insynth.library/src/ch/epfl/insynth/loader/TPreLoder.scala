@@ -72,7 +72,7 @@ trait TPreLoder extends TExtractor with TDeclarationFactory {
 	  for (clazz <- imports){
 	    try {
 	      if(!clazz.nameString.contains("$")
-	         && clazz.exists
+	         && ask(() => clazz.exists)
 	         && !clazz.isSynthetic
 	         && (clazz.isClass || clazz.isModule)
 	         && !clazz.isAbstractClass
@@ -122,7 +122,8 @@ trait TPreLoder extends TExtractor with TDeclarationFactory {
 	    workingSet = workingSet.tail
 	    
 	    //What "parents" contains?
-	 	val parents = curr.tpe.parents
+	 	val parents = //curr.tpe.parents
+	 	  ask( () => curr.tpe.parents)
 	 	
 	    val superTypes = parents.map(x => x.typeSymbol).toSet.filterNot(x => setOfNames.contains(x.fullName))
 	    

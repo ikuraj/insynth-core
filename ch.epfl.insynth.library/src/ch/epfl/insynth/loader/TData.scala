@@ -143,9 +143,9 @@ class RawData {
     
   class Coerction(subclass:Symbol, superclass:Symbol) {
     def getSubclass = subclass
-    def getSubtype = subclass.tpe
+    def getSubtype = ask(() => subclass.tpe)
     def getSuperclass = superclass
-    def getSupertype = superclass.tpe
+    def getSupertype = ask(() => superclass.tpe)
   }
   
   class Data {
@@ -341,7 +341,7 @@ class RawData {
         for {
 	      tpe <- tpes
 	      if (!tpe.nameString.contains("$")
-	          && tpe.exists
+	          && ask(() => tpe.exists)
 	          && (tpe.isClass || tpe.isModule || tpe.isAbstractClass || tpe.isTrait)
 	          && !tpe.fullName.equals(mostNestedOwnerType.fullName)
 	          && !(otherNestedTypes.exists(x => x.fullName.equals(tpe.fullName)))
@@ -361,7 +361,7 @@ class RawData {
         for {
 	      tpe <- pkg.tpe.decls
 	      if (!tpe.nameString.contains("$")
-	          && tpe.exists
+	          && ask(() => tpe.exists)
 	          && !tpe.fullName.equals(topOwnerType.fullName)
 	          && (tpe.isClass || tpe.isModule || tpe.isAbstractClass || tpe.isTrait)
 	          && !tpe.isSynthetic
@@ -407,7 +407,8 @@ class RawData {
 	    workingSet = workingSet.tail
 	    
 	    //What "parents" contains?
-	 	val parents = curr.tpe.parents
+	 	val parents = //curr.tpe.parents
+	 	  ask(() => curr.tpe.parents)
 	 	
 	    val superTypes = parents.map(x => x.typeSymbol).toSet.filterNot(x => setOfNames.contains(x.fullName))
 	    
@@ -427,13 +428,15 @@ class RawData {
       val types = loadedTypes ++ ScalaTypeExtractor.getAllTypes
       types.foreach{
         subclass =>
-          subclass.tpe.parents.foreach {
-            superclass => 
-              if (!pairs.contains((subclass.fullName, superclass.typeSymbol.fullName))){
-                coercs = new Coerction(subclass, superclass.typeSymbol) :: coercs
-                pairs += ((subclass.fullName, superclass.typeSymbol.fullName))
-              }
-          }
+          ask(	() =>
+	          subclass.tpe.parents.foreach {
+	            superclass => 
+	              if (!pairs.contains((subclass.fullName, superclass.typeSymbol.fullName))){
+	                coercs = new Coerction(subclass, superclass.typeSymbol) :: coercs
+	                pairs += ((subclass.fullName, superclass.typeSymbol.fullName))
+	              }
+	          }
+          )
       }
       coercs 
     }

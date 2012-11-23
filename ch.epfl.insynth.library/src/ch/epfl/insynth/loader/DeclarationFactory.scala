@@ -47,7 +47,7 @@ trait TDeclarationFactory extends TData {
   
     def getLocalDecl(sym:Symbol):Option[Declaration] = {
       val name = sym.fullName
-      val tpe = sym.tpe
+      val tpe = ask(() => sym.tpe)
       val localOption = makeLocalDecl(name, tpe)
       localOption match {
         case Some(local) =>
