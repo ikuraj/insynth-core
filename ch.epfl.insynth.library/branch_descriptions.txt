@@ -1,0 +1,8 @@
+use "git branch --edit-description" when git gets updated to 1.7.9
+
+leon - modification so that more declarations are seen for synthesis in Leon examples
+leon-work - started doing modifications to adapt to leon language (deprecated - moved to leon repo)
+compilerThreadAccess - changes for fixing PC thread access issues (merged into master)
+publicationExperiments - experimenting for the publication (different weights etc.)
+scala-2.10 - branch for solely 2.10 build (deprecated)
+separatingBuilds - branch that did the separation of 2.9 and 2.10 builds (deprecated)
