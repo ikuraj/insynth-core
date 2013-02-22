@@ -4,6 +4,8 @@ import ch.epfl.insynth.InSynth
 import ch.epfl.insynth.trees.TypeTransformer
 import ch.epfl.insynth.env.Declaration
 
+import ch.epfl.insynth.Config.inSynthLogger
+
 trait TDeclarationFactory extends TData {
   self:InSynth =>
     
@@ -68,7 +70,10 @@ trait TDeclarationFactory extends TData {
             val inSynthType = TypeTransformer.transform(scalaType)
             Some(Declaration(name, inSynthType, scalaType))
           } catch {
-            case _ => None
+            case ex =>
+				      inSynthLogger.fine("exception " + ex)
+				      inSynthLogger.fine(ex.getStackTrace.mkString("\n"))
+              None
           }
         case None => None //throw new Exception("No type found for decl in: "+ this.getClass.getName)
       }     
@@ -83,7 +88,10 @@ trait TDeclarationFactory extends TData {
             val inSynthType = TypeTransformer.transform(scalaType)
             Some(Declaration(name, inSynthType, scalaType))
           } catch {
-            case _ => None
+            case ex =>
+			        inSynthLogger.fine("exception " + ex)
+			        inSynthLogger.fine(ex.getStackTrace.mkString("\n"))
+			        None
           }            
         case None => None //throw new Exception("No type found for decl in: "+ this.getClass.getName)
       }     
@@ -104,7 +112,10 @@ trait TDeclarationFactory extends TData {
                 decl.setInheritanceFun(true)
                 Some(decl)
               } catch {
-                case _ => None
+                case ex => 
+					        inSynthLogger.fine("exception " + ex)
+					        inSynthLogger.fine(ex.getStackTrace.mkString("\n"))
+					        None
               }              
             case None => None
           }

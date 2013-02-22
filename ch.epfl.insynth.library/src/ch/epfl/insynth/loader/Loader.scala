@@ -18,19 +18,14 @@ trait TLoader extends TCollector with TExtractor with TDeclarationFactory {
     
     private var collector = new Collector()
   
-    //TODO: 
-    //(1) Load weights
-    //(2) Load coerctions
-    //(3) Loas subtypes
-    //(4) Check/Fix some issues about method/field completition and "this"
     def load(pos:Position, tree:Tree, builder:InitialEnvironmentBuilder):ScalaType = {
+      
       val data = collector.gather(tree, pos)
       
       if (data.hasDesiredType) {
 
-        if (data.hasThisType) {
-          //println("This type: "+ data.getThisType)
-          
+        if (data.hasThisType) {    
+          //println("This type: "+ data.getThisType)      
           val thisOption = DeclarationFactory.getThisDecl(data.getThisType)
           
           thisOption match {
@@ -101,9 +96,10 @@ trait TLoader extends TCollector with TExtractor with TDeclarationFactory {
           case None => throw new Exception("Desired Type not found in: "+this.getClass.getName)
         }
       } else throw new Exception("Desired Type not found in: "+this.getClass.getName)
+      
     }
     
-    private def loadDecls(types:List[Symbol], builder:InitialEnvironmentBuilder) = {
+    private def loadDecls(types:List[Symbol], builder:InitialEnvironmentBuilder) = {      
        var decls = List.empty[Declaration]
        for {
          tpe <- types

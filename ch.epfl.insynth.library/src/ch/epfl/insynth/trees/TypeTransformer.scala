@@ -2,6 +2,8 @@ package ch.epfl.insynth.trees
 
 import ch.epfl.scala.trees.{Instance => ScalaInstance, Const => ScalaConst, _}
 
+import ch.epfl.insynth.Config.inSynthLogger
+
 object TypeTransformer {
 
   //TODO: Cover Variables
@@ -12,7 +14,9 @@ object TypeTransformer {
     case ScalaInstance(name, list) if (list != null && !list.isEmpty && name != null) => Instance(name, list.map(transform))
     case ScalaConst(name) if(name != null) => Const(name)
     case Inheritance(subtype, supertype) if(subtype != null && supertype != null)  => IArrow(TSet(transform(subtype)), transform(supertype))
-    case t => throw new Exception("Case: "+t.getClass.getName+" should be covered in 'TypeTransformer.transform()'.")
+    case t =>
+      inSynthLogger.fine("Case: "+t.getClass.getName+" should be covered in 'TypeTransformer.transform()'.")
+      throw new Exception("Case: "+t.getClass.getName+" should be covered in 'TypeTransformer.transform()'.")
   }
 
   //TODO: Cover Variables
@@ -25,7 +29,9 @@ object TypeTransformer {
     case ScalaConst(name)  if(name != null) => 
       if(params.isEmpty) Const(name)
       else Arrow(TSet(params.toList.map(transform)), Const(name))
-    case t => throw new Exception("Case: "+t.getClass.getName+" should be covered in 'TypeTransformer.transformFunction()'.")
+    case t =>
+      inSynthLogger.fine("Case: "+t.getClass.getName+" should be covered in 'TypeTransformer.transformFunction()'.")
+      throw new Exception("Case: "+t.getClass.getName+" should be covered in 'TypeTransformer.transformFunction()'.")
   }
   
   def trasformInheritance(subType:ScalaType, superType:ScalaType):Type = IArrow(TSet(transform(subType)), transform(superType))

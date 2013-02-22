@@ -4,6 +4,9 @@ import scala.tools.nsc.interactive.Global
 import ch.epfl.insynth.env.InitialEnvironmentBuilder
 import ch.epfl.insynth.InSynth
 
+import ch.epfl.insynth.Config
+import ch.epfl.insynth.Config.inSynthLogger
+
 trait TCollector extends TData {
   self: InSynth =>
   
@@ -54,7 +57,8 @@ class Collector {
 	    case Template(parents, self, body) =>
           this.traverseStats(pos, body, tree.symbol)
           
-	    case t => /*throw new Exception */ println("Case not covered in Collector.traverse: "+t.getClass.getName)      
+	    case t => /*throw new Exception */
+	      Config.inSynthLogger.fine("Case not covered in Collector.traverse: "+t.getClass.getName)      
 	  }
     } else {
       if(this.isCompletition(tree))
@@ -141,8 +145,10 @@ class Collector {
 			                   case _ => 
 			                 }
 		                   }
-		                 } catch{
-		                   case _ =>
+		                 } catch {
+		                   case ex =>		                     
+								        inSynthLogger.fine("exception " + ex)
+								        inSynthLogger.fine(ex.getStackTrace.mkString("\n"))
 		                 }
 		                 i+=1
 		               }

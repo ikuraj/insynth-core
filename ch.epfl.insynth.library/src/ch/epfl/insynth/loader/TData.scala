@@ -136,7 +136,7 @@ class RawData {
     def isInObject = inObject
     def isConstructor = constructor
     def needReceiver = !inObject && !constructor
-    def needParentheses:Boolean = this.symbol.tpe.paramSectionCount != 0
+    def needParentheses:Boolean = ask ( () => this.symbol.tpe.paramSectionCount != 0 )
     def isApply = this.symbol.simpleName.toString.equals("apply")
     def isMethod = symbol.isMethod
   }

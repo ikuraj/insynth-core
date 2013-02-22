@@ -28,6 +28,10 @@ class InSynth(val compiler: Global) extends TLoader with TPreLoder {
     var tree = wrapTypedTree(pos.source, false)
     val desiredType = loader.load(pos, tree, builder)
 
+    Config.inSynthLogger.fine("builder.getAllDeclarations.size: " + builder.getAllDeclarations.size)   
+    Config.inSynthLogger.finer("Declarations: \n" + builder.getAllDeclarations.sortWith( (d1, d2) => d1.fullName.compareTo(d2.fullName) < 0 ).map( decl => decl.fullName + 
+      "[" + decl.scalaType + " : " + decl.inSynthType + " : " + decl.getWeight.getValue + "]" ).mkString("\n"))
+    
     val engine = new Engine(builder, desiredType, new WeightScheduler(), TimeOut(Config.getTimeOutSlot))
     
     val time = System.currentTimeMillis
@@ -37,6 +41,7 @@ class InSynth(val compiler: Global) extends TLoader with TPreLoder {
     if (solution != null) {
       Config.inSynthLogger.info("Solution found in " + (System.currentTimeMillis - time) + " ms.")
       Config.inSynthLogger.info("Solution found: " + TreePrinter(solution, Config.proofTreeLevelToLog))
+      //TreePrinter.printAnswerAsXML(Config.proofTreeOutput, solution, Config.proofTreeLevelToLog)
     } else 
       Config.inSynthLogger.info("No solution found in " + (System.currentTimeMillis - time) + " ms")
     

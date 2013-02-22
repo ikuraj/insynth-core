@@ -4,6 +4,8 @@ import ch.epfl.insynth.InSynth
 import ch.epfl.insynth.typetransformations.TExtractor
 import ch.epfl.insynth.env.Declaration
 
+import ch.epfl.insynth.Config.inSynthLogger
+
 trait TPreLoder extends TExtractor with TDeclarationFactory {
   self:InSynth =>
     
@@ -70,6 +72,7 @@ trait TPreLoder extends TExtractor with TDeclarationFactory {
 	  var predefs = List[Symbol]()
 	  val imports = importSymbol.tpe.decls
 	  for (clazz <- imports){
+	    // why is this try here?
 	    try {
 	      if(!clazz.nameString.contains("$")
 	         && ask(() => clazz.exists)
@@ -81,7 +84,9 @@ trait TPreLoder extends TExtractor with TDeclarationFactory {
 	         && !clazz.isPackage)
 	         predefs = clazz :: predefs
 	    } catch {
-	      case _ =>
+	      case ex =>
+	        inSynthLogger.fine("exception " + ex)
+	        inSynthLogger.fine(ex.getStackTrace.mkString("\n"))
 	    }
 	  }
 
@@ -122,10 +127,12 @@ trait TPreLoder extends TExtractor with TDeclarationFactory {
 	    workingSet = workingSet.tail
 	    
 	    //What "parents" contains?
-	 	val parents = //curr.tpe.parents
-	 	  ask( () => curr.tpe.parents)
+//	    val parents = //curr.tpe.parents
+//	 	  ask( () => curr.tpe.parents)
 	 	
-	    val superTypes = parents.map(x => x.typeSymbol).toSet.filterNot(x => setOfNames.contains(x.fullName))
+	    val superTypes = ask( () =>
+        curr.tpe.parents.map(x => x.typeSymbol).toSet.filterNot(x => setOfNames.contains(x.fullName))
+      )
 	    
 	    workingSet ++= superTypes
 	    setOfNames ++= superTypes.map(x => x.fullName)

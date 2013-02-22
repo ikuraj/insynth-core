@@ -4,6 +4,8 @@ import scala.tools.nsc.interactive.Global
 import ch.epfl.scala.trees.{Const => ScalaConst, Method => ScalaMethod, Function => ScalaFunction, Instance => ScalaInstance, ScalaType}
 import ch.epfl.insynth.InSynth
 
+import ch.epfl.insynth.Config.inSynthLogger
+
 trait TExtractor{
   self:InSynth =>
 
@@ -42,6 +44,8 @@ object ScalaTypeExtractor {
       Some(traverse(tpe))
     } catch {
       case ex =>
+        inSynthLogger.fine("exception " + ex)
+        inSynthLogger.fine(ex.getStackTrace.mkString("\n"))
         None
     }
   }
@@ -57,16 +61,20 @@ object ScalaTypeExtractor {
         getReturnType(tpe)))
     } catch {
       case ex =>
+        inSynthLogger.fine("exception " + ex)
+        inSynthLogger.fine(ex.getStackTrace.mkString("\n"))
         None
     }
   }   
   
-  private def isRepeated(sym:Symbol) = sym.tpe.typeSymbol.fullName == "scala.<repeated>"  
+  private def isRepeated(sym:Symbol) = sym.tpe.typeSymbol.fullName == "scala.<repeated>" 
+    // caller will wrap into ask
+    //ask( () => sym.tpe.typeSymbol.fullName == "scala.<repeated>")  
   
   //TODO: What to do with implicit params and type* ?
   private def getParamList(tpe:Type): List[List[ScalaType]] = {
     val paramss = tpe.paramss
-    paramss.map(params => params.filterNot(param => param.isImplicit || isRepeated(param)).map(param => traverse(param.tpe)))
+    ask( () => paramss.map(params => params.filterNot(param => param.isImplicit || isRepeated(param)).map(param => traverse(param.tpe))) )
   }
   
   private def onlyReturnType(rawReturn:Type):Type = rawReturn match {
@@ -88,7 +96,7 @@ object ScalaTypeExtractor {
 	    
       //Function type
 	  case TypeRef(pre: Type, sym: Symbol, args: List[Type])
-	    if(definitions.isFunctionType(tpe)) =>
+	    if( ask( () => definitions.isFunctionType(tpe) ) ) =>
 	    val list = args.init.map(traverse)
 	    val result = traverse(args.last)
 	      
@@ -112,9 +120,9 @@ object ScalaTypeExtractor {
 	      allTypes += sym
 	      
 	      ScalaConst(SugarFree(sym.fullName))
-	    } else throw new Exception("<<Parametrized types not supported: "+tpe.getClass.getName+">>")
+	    } else throw new Exception("<<Parametrized types not supported: "+ ask ( () => tpe.getClass.getName) +">>")
 	    
-	  case _ => throw new Exception("<<Not supported: "+tpe.getClass.getName+">>") 
+	  case _ => throw new Exception("<<Not supported: "+ ask ( () => tpe.getClass.getName) +">>") 
     }
   }  
 }

@@ -1,11 +1,12 @@
 package ch.epfl.insynth.util
 
+import scala.xml.Node
+import scala.xml.PrettyPrinter
+
+import java.io.{ Writer, PrintWriter, FileWriter, ByteArrayOutputStream }
+
 import ch.epfl.insynth.env._
 import ch.epfl.scala.trees._
-
-import java.io.PrintWriter
-import java.io.FileWriter
-import java.io.ByteArrayOutputStream
 
 object TreePrinter {
  
@@ -148,6 +149,35 @@ object TreePrinter {
             printlnDeclNamesWithIndention(out, simpleNode.getDecls, 0)
           }
       }
+  }
+  
+  def printAnswerAsXML(out: PrintWriter, answer: ContainerNode, depth: Int) {
+    printAnswerAsXML(out, answer, "query", Set.empty, depth)
+  }
+  
+  private def printAnswerAsXML(out: PrintWriter, answer: ContainerNode, tpe: String, set: Set[SimpleNode], depth:Int) {
+    println("printAnswerAsXML called")
+    if(depth > 0) {
+    	out.println("<container size = '" + answer.getNodes.size + "' type='" + tpe + "' >")
+      answer.getNodes.foreach{
+        simpleNode =>
+          if (!set.contains(simpleNode)) {          
+            out.println("""<simple visited="no">""")
+            out.println(simpleNode.getDecls.map("<decl name='" + _.getSimpleName + "'/>").mkString("\n","\n\t,","\n"))
+            for ((tpe, container) <- simpleNode.getParams) {
+              printAnswerAsXML(out, container, tpe.toString, set + simpleNode, depth-1)
+            }
+            out.println("</simple>")
+          } else {
+            out.println("""<simple visited="yes">""")
+            simpleNode.getDecls.map("<decl name='" + _.getSimpleName + "'/>").mkString("\n","\n\t,","\n")
+            out.println("</simple>")
+          }
+      }
+    	out.println("</container>")	
+    }
+    out.flush
+    
   }
   
   private def printAnswerWithDebth(out:PrintWriter, answer:ContainerNode, set:Set[SimpleNode], length:Int, depth:Int) {
