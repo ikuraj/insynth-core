@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<project name="Ant ch.epfl.insynth.library for Scala 2.10" default="reinstall" basedir=".">
+<project name="Ant ch.epfl.insynth.library for Scala 2.10" default="reinstall" basedir="."
+  xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 	<description>
     Ant project for building InSynth library
   </description>
@@ -39,12 +40,16 @@
 	<!-- other properties -->
 	<property name="dist.jar" value="${dist.dir}/${lib.name}" />
 
+  <artifact:dependencies pathId="dependency.download.scala">
+    <dependency groupId="org.scala-lang" artifactId="scala-reflect" version="2.10.1"/>
+    <dependency groupId="org.scala-lang" artifactId="scala-compiler" version="2.10.1"/>
+    <dependency groupId="org.scala-lang" artifactId="scala-library" version="2.10.1"/>
+  </artifact:dependencies>
+
 	<!-- required to use the tasks scalac, fsc and scaladoc -->
 	<taskdef resource="scala/tools/ant/antlib.xml">
 		<classpath>
-			<pathelement location="${scala-compiler.jar}" />
-			<pathelement location="${scala-library.jar}" />
-			<pathelement location="${scala-reflect.jar}" />
+			<path refid="dependency.download.scala"/>
 		</classpath>
 	</taskdef>
 
@@ -56,10 +61,7 @@
 			<include name="**/*.scala" />
 			<include name="**/*.java" />
 			<classpath>
-				<pathelement location="${scala-compiler.jar}" />
-				<pathelement location="${scala-library.jar}" />
-				<pathelement location="${scala-reflect.jar}" />
-				<pathelement location="${build.dir}" />
+	      <path refid="dependency.download.scala"/>
 			</classpath>
 		</scalac>
 	</target>
