@@ -12,17 +12,14 @@
 	<property file="properties/scala-2.10.build.properties"/>
 	
 	<!-- System paths -->
-	<path id="junit4.path">
-		<pathelement location="/home/ivcha/DevelopmentApps/eclipse_plugin/plugins/org.junit_4.8.2.v4_8_2_v20110321-1705/junit.jar"/>
-		<pathelement location="/home/ivcha/DevelopmentApps/eclipse_plugin/plugins/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
-	</path>
+  <artifact:dependencies pathId="dependency.test.download">
+    <dependency groupId="junit" artifactId="junit" version="4.8.2" scope="test"/>
+    <dependency groupId="org.hamcrest" artifactId="hamcrest-core" version="1.1" scope="test"/>
+  </artifact:dependencies>
 
 	<!-- The settings can be overridden in local.properties. -->
 	<property environment="env" />
 	<property name="java.home" value="${JAVA_HOME}" />
-	<property name="scala-library.jar" value="${scala.home}/lib/scala-library.jar" />
-	<property name="scala-compiler.jar" value="${scala.home}/lib/scala-compiler.jar" />
-	<property name="scala-reflect.jar" value="${scala.home}/lib/scala-reflect.jar"/>
 	<property name="javac.default.params" value="" />
 	<property name="scalac.default.params" value="-deprecation -unchecked" />
 
@@ -68,12 +65,13 @@
 
 	<target name="compile-tests" description="compiles tests for the project">
 		<mkdir dir="${tests.build.dir}" />
-		<scalac srcdir="${tests.dir}" destdir="${tests.build.dir}" force="changed" addparams="${scalac.default.params}" >
+		<scalac
+			srcdir="${tests.dir}" destdir="${tests.build.dir}"
+			force="changed" addparams="${scalac.default.params}" >
 			<include name="**/*.scala" />
 			<classpath>
-				<path refid="junit4.path"/>
-				<pathelement location="${scala-library.jar}" />
-				<pathelement location="${build.dir}" />
+				<path refid="dependency.test.download"/>
+				<path refid="dependency.download.scala"/>
 			</classpath>
 		</scalac>
 	</target>
@@ -82,10 +80,9 @@
 		<mkdir dir="${tests.results.dir}" />
 		<junit showoutput="yes" printsummary="yes" haltonfailure="yes">
 			<classpath>
-				<path refid="junit4.path" />
+				<path refid="dependency.test.download" />
 				<pathelement location="${build.dir}" />
 				<pathelement location="${tests.build.dir}"/>
-				<pathelement location="${scala-library.jar}" />				
 			</classpath>
 
 			<formatter type="xml" />
